@@ -2,7 +2,7 @@
 /*
 Plugin Name: GitHub Update Checker
 Description: Simple plugin to check for updates from a public GitHub repository.
-Version: 1.0.0
+Version: 0.02
 Author: Your Name
 */
 
@@ -23,7 +23,7 @@ class GitHubUpdateChecker {
 
         $body = wp_remote_retrieve_body($response);
         $data = json_decode($body);
-
+        
         if (isset($data->tag_name) && version_compare($data->tag_name, $this->get_current_version(), '>')) {
             add_action('admin_notices', array($this, 'show_update_notice'));
             if (isset($_GET['update_plugin']) && $_GET['update_plugin'] == 'true') {
@@ -63,16 +63,16 @@ class GitHubUpdateChecker {
     }
 }
 
-// Додаємо дію для ініціалізації шорткоду
-add_action( 'init', 'map_block_view_register_shortcode' );
-// Реєстрація шорткоду
-function map_block_view_register_shortcode() {
-    add_shortcode( 'map_block_view_manufacturers', 'map_block_view_manufacturers_shortcode' );
-}
-// Функція для обробки шорткоду
-function map_block_view_manufacturers_shortcode() {
-    return "Hello, World!";
-}
+// // Додаємо дію для ініціалізації шорткоду
+// add_action( 'init', 'map_block_view_register_shortcode' );
+// // Реєстрація шорткоду
+// function map_block_view_register_shortcode() {
+//     add_shortcode( 'map_block_view_manufacturers', 'map_block_view_manufacturers_shortcode' );
+// }
+// // Функція для обробки шорткоду
+// function map_block_view_manufacturers_shortcode() {
+//     return "Hello, World!";
+// }
 
 new GitHubUpdateChecker(__FILE__);
 ?>
