@@ -41,7 +41,7 @@ class GitHubUpdateChecker {
     }
 
     public function show_update_notice() {
-        echo '<div class="notice notice-warning"><p>New version of GitHub Update Checker is available. <a href="' . admin_url('admin.php?update_plugin=true') . '">Update now</a></p></div>';
+        echo '<div class="notice notice-warning"><p>New version of GitHub Update Checker is available. <a href="' . admin_url('index.php?update_plugin=true') . '">Update now</a></p></div>';
     }
 
     public function update_plugin($url) {
@@ -51,7 +51,9 @@ class GitHubUpdateChecker {
             return;
         }
 
-        $result = unzip_file($zip_file, WP_PLUGIN_DIR);
+        $this->delete_old_version();
+
+        $result = $this->unzip_file($zip_file, WP_PLUGIN_DIR);
 
         if (is_wp_error($result)) {
             return;
@@ -60,6 +62,40 @@ class GitHubUpdateChecker {
         unlink($zip_file);
 
         echo '<div class="notice notice-success"><p>Plugin updated successfully!</p></div>';
+    }
+
+    private function delete_old_version() {
+        $plugin_dir = plugin_dir_path($this->plugin_file);
+        $this->delete_directory($plugin_dir);
+    }
+
+    private function delete_directory($dir) {
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        $items = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($items as $item) {
+            $item->isDir() ? rmdir($item) : unlink($item);
+        }
+
+        rmdir($dir);
+    }
+
+    private function unzip_file($file, $destination) {
+        $zip = new ZipArchive;
+        $res = $zip->open($file);
+        if ($res === TRUE) {
+            $zip->extractTo($destination);
+            $zip->close();
+            return true;
+        } else {
+            return new WP_Error('unzip_error', __('Error unzipping file.'));
+        }
     }
 }
 
