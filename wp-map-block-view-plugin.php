@@ -63,5 +63,16 @@ class GitHubUpdateChecker {
     }
 }
 
+// Додаємо дію для ініціалізації шорткоду
+add_action( 'init', 'map_block_view_register_shortcode' );
+// Реєстрація шорткоду
+function map_block_view_register_shortcode() {
+    add_shortcode( 'map_block_view_manufacturers', 'map_block_view_manufacturers_shortcode' );
+}
+// Функція для обробки шорткоду
+function map_block_view_manufacturers_shortcode() {
+    return "Hello, World!";
+}
+
 new GitHubUpdateChecker(__FILE__);
 ?>
