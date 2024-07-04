@@ -2,107 +2,117 @@
 /*
 Plugin Name: GitHub Update Checker
 Description: Simple plugin to check for updates from a public GitHub repository.
-Version: 0.04
+Version: 0.05
 Author: Your Name
 */
 
 class GitHubUpdateChecker {
-    private $api_url = 'https://api.github.com/repos/AndriyBalakalchuk/wp-map-block-view-plugin/releases/latest'; // Заміни 'username/repository' на свій репозиторій
-    private $plugin_file;
-    private $plugin_dir;
-    private $plugin_version;
+    private $strApi_url = 'https://api.github.com/repos/AndriyBalakalchuk/wp-map-block-view-plugin/releases/latest'; // Заміни 'username/repository' на свій репозиторій
+    private $strPlugin_file;
+    private $strPlugin_dir;
+    private $strPlugin_name;
+    private $strPlugin_version;
 
-    public function __construct($plugin_file) {
-        $this->plugin_file = $plugin_file;
-        $this->plugin_dir = plugin_dir_path($plugin_file);
-        $this->plugin_version = get_current_version();
+    public function __construct($strPlugin_file) {
+        $this->strPlugin_file = $strPlugin_file;
+        $this->strPlugin_dir = plugin_dir_path($strPlugin_file);
+        $this->strPlugin_name = $this->get_current_plugin_info("Name");
+        $this->strPlugin_version = $this->get_current_plugin_info("Version");
         add_action('admin_init', array($this, 'check_for_update'));
     }
 
-    public function get_current_version() {
+    public function get_current_plugin_info($strWhat="Version") {
         if (!function_exists('get_plugin_data')) {
             require_once(ABSPATH . 'wp-admin/includes/plugin.php');
         }
-        $plugin_data = get_plugin_data($this->plugin_file);
-        return $plugin_data['Version'];
+        $objPlugin_data = get_plugin_data($this->strPlugin_file);
+        return $objPlugin_data[$strWhat]===NULL ? "Unknown ".$strWhat : $objPlugin_data[$strWhat];
     }
 
     public function check_for_update() {
-        $response = wp_remote_get($this->api_url);
-        if (is_wp_error($response)) {
+        $objResponse = wp_remote_get($this->strApi_url);
+        if (is_wp_error($objResponse)) {
+            error_log($objResponse->get_error_message());
             return;
         }
 
-        $body = wp_remote_retrieve_body($response);
-        $data = json_decode($body);
+        $strBody = wp_remote_retrieve_body($objResponse);
+        $objData = json_decode($strBody);
         
-        if (isset($data->tag_name) && version_compare($data->tag_name, $this->plugin_version, '>')) {
+        if (isset($objData->tag_name) && version_compare($objData->tag_name, $this->strPlugin_version, '>')) {
             add_action('admin_notices', array($this, 'show_update_notice'));
-            if (isset($_GET['update_plugin']) && $_GET['update_plugin'] == 'true') {
-                $this->update_plugin($data->zipball_url);
+            if (isset($_GET['update_bvstudio_plugin']) && $_GET['update_bvstudio_plugin'] == 'true') {
+                $this->update_plugin($objData->zipball_url);
             }
         }
     }
 
     public function show_update_notice() {
-        echo '<div class="notice notice-warning"><p>New version of GitHub Update Checker is available. <a href="' . admin_url('index.php?update_plugin=true') . '">Update now</a></p></div>';
+        echo '<div class="notice notice-warning"><p>New version of '.$this->strPlugin_name.' is available. <a href="' . admin_url('index.php?update_bvstudio_plugin=true') . '">Update now</a></p></div>';
     }
 
     public function update_plugin($url) {
         $zip_file = download_url($url);
 
         if (is_wp_error($zip_file)) {
+            error_log($zip_file->get_error_message());
+            return;
+        }
+
+        $strTemp_dir = WP_PLUGIN_DIR . '/temp_bvstudio_plugin_update';
+
+        if (!is_dir($strTemp_dir)) {
+            mkdir($strTemp_dir, 0755, true);
+        }
+
+        $objResult = $this->unzip_file($zip_file, $strTemp_dir);
+
+        if (is_wp_error($objResult)) {
+            error_log($objResult->get_error_message());
             return;
         }
 
         $this->delete_old_version();
 
-        $temp_dir = WP_PLUGIN_DIR . '/temp_plugin_update';
-
-        if (!is_dir($temp_dir)) {
-            mkdir($temp_dir, 0755, true);
+        if (!is_dir($this->strPlugin_dir)) {
+            mkdir($this->strPlugin_dir, 0755, true);
         }
 
-        $result = $this->unzip_file($zip_file, $temp_dir);
+        $this->move_files($strTemp_dir, $this->strPlugin_dir);
 
-        if (is_wp_error($result)) {
-            return;
-        }
+        $this->delete_directory($strTemp_dir);
 
-        $this->move_files($temp_dir, $this->plugin_dir);
-
-        $this->delete_directory($temp_dir);
         unlink($zip_file);
 
         echo '<div class="notice notice-success"><p>Plugin updated successfully!</p></div>';
     }
 
     private function delete_old_version() {
-        $this->delete_directory($this->plugin_dir);
+        $this->delete_directory($this->strPlugin_dir);
     }
 
-    private function delete_directory($dir) {
-        if (!is_dir($dir)) {
+    private function delete_directory($strDir) {
+        if (!is_dir($strDir)) {
             return;
         }
 
-        $items = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+        $arrItems = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($strDir, RecursiveDirectoryIterator::SKIP_DOTS),
             RecursiveIteratorIterator::CHILD_FIRST
         );
 
-        foreach ($items as $item) {
-            $item->isDir() ? rmdir($item) : unlink($item);
+        foreach ($arrItems as $strItem) {
+            $strItem->isDir() ? rmdir($strItem) : unlink($strItem);
         }
 
-        rmdir($dir);
+        rmdir($strDir);
     }
 
-    private function unzip_file($file, $destination) {
+    private function unzip_file($file, $strDestination) {
         $zip = new ZipArchive;
         $res = $zip->open($file);
         if ($res === TRUE) {
-            $zip->extractTo($destination);
+            $zip->extractTo($strDestination);
             $zip->close();
             return true;
         } else {
@@ -110,18 +120,18 @@ class GitHubUpdateChecker {
         }
     }
 
-    private function move_files($source, $destination) {
-        $items = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS),
+    private function move_files($strSource, $strDestination) {
+        $arrItems = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($strSource, RecursiveDirectoryIterator::SKIP_DOTS),
             RecursiveIteratorIterator::SELF_FIRST
         );
 
-        foreach ($items as $item) {
-            $dest_path = $destination . DIRECTORY_SEPARATOR . $items->getSubPathName();
-            if ($item->isDir()) {
-                mkdir($dest_path, 0755, true);
+        foreach ($arrItems as $strItem) {
+            $strDest_path = $strDestination . DIRECTORY_SEPARATOR . $arrItems->getSubPathName();
+            if ($strItem->isDir()) {
+                mkdir($strDest_path, 0755, true);
             } else {
-                rename($item, $dest_path);
+                rename($strItem, $strDest_path);
             }
         }
     }
