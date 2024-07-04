@@ -10,9 +10,5 @@ Author: Your Name
 require_once('update.class.php');
 // Заміни 'AndriyBalakalchuk/wp-map-block-view-plugin' на свій репозиторій
 // Перевіряємо, чи ми на сторінці плагінів, перед ініціалізацією класу
-add_action('admin_init', function() {
-    if (is_admin() && isset($_GET['page']) && $_GET['page'] === 'plugins') {
-        new GitHubUpdateChecker(__FILE__,'https://api.github.com/repos/AndriyBalakalchuk/wp-map-block-view-plugin/releases/latest');
-    }
-});
+new GitHubUpdateChecker(__FILE__,'https://api.github.com/repos/AndriyBalakalchuk/wp-map-block-view-plugin/releases/latest');
 ?>
