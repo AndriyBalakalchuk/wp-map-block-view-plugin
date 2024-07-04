@@ -10,12 +10,14 @@ class GitHubUpdateChecker {
     private $strApi_url = 'https://api.github.com/repos/AndriyBalakalchuk/wp-map-block-view-plugin/releases/latest'; // Заміни 'username/repository' на свій репозиторій
     private $strPlugin_file;
     private $strPlugin_dir;
+    private $strPlugin_dir_name;
     private $strPlugin_name;
     private $strPlugin_version;
 
     public function __construct($strPlugin_file) {
         $this->strPlugin_file = $strPlugin_file;
         $this->strPlugin_dir = plugin_dir_path($strPlugin_file);
+        $this->strPlugin_dir_name = trim(dirname(plugin_basename($strPlugin_file)), '/');
         $this->strPlugin_name = $this->get_current_plugin_info("Name");
         $this->strPlugin_version = $this->get_current_plugin_info("Version");
         add_action('admin_init', array($this, 'check_for_update'));
@@ -52,33 +54,40 @@ class GitHubUpdateChecker {
     }
 
     public function update_plugin($url) {
+        //скачать архів нової версії
         $zip_file = download_url($url);
-
         if (is_wp_error($zip_file)) {
             error_log($zip_file->get_error_message());
             return;
         }
 
+        //скачано, створити темп директорії
         $strTemp_dir = WP_PLUGIN_DIR . '/temp_bvstudio_plugin_update';
-
         if (!is_dir($strTemp_dir)) {
             mkdir($strTemp_dir, 0755, true);
         }
 
+        //розпакувати архів нової версії
         $objResult = $this->unzip_file($zip_file, $strTemp_dir);
-
         if (is_wp_error($objResult)) {
             error_log($objResult->get_error_message());
             return;
         }
 
-        $this->delete_old_version();
-
-        if (!is_dir($this->strPlugin_dir)) {
-            mkdir($this->strPlugin_dir, 0755, true);
+        //з архіву розпаковано папку, знаходимо назву папки в нашій темп директорії
+        //отримати список фсіх папкок в темп директорії
+        $arrFiles = scandir($strTemp_dir);
+        foreach ($arrFiles as $strItem) {
+            if ($strItem == '.' || $strItem == '..') {continue;} 
+            if (is_dir($strTemp_dir . '/' . $strItem)) {
+                rename($strTemp_dir . '/' . $strItem, $strTemp_dir."/{$this->strPlugin_dir_name}");
+                break;
+            }
         }
 
-        $this->move_files($strTemp_dir, $this->strPlugin_dir);
+        $this->delete_old_version();
+
+        $this->move_files($strTemp_dir, WP_PLUGIN_DIR);
 
         $this->delete_directory($strTemp_dir);
 
@@ -136,17 +145,6 @@ class GitHubUpdateChecker {
         }
     }
 }
-
-// // Додаємо дію для ініціалізації шорткоду
-// add_action( 'init', 'map_block_view_register_shortcode' );
-// // Реєстрація шорткоду
-// function map_block_view_register_shortcode() {
-//     add_shortcode( 'map_block_view_manufacturers', 'map_block_view_manufacturers_shortcode' );
-// }
-// // Функція для обробки шорткоду
-// function map_block_view_manufacturers_shortcode() {
-//     return "Hello, World!";
-// }
 
 new GitHubUpdateChecker(__FILE__);
 ?>
