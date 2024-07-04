@@ -2,7 +2,7 @@
 /*
 Plugin Name: GitHub Update Checker
 Description: Simple plugin to check for updates from a public GitHub repository.
-Version: 0.06
+Version: 0.07
 Author: Your Name
 */
 
@@ -42,9 +42,10 @@ class GitHubUpdateChecker {
         $objData = json_decode($strBody);
         
         if (isset($objData->tag_name) && version_compare($objData->tag_name, $this->strPlugin_version, '>')) {
-            add_action('admin_notices', array($this, 'show_update_notice'));
             if (isset($_GET['update_bvstudio_plugin']) && $_GET['update_bvstudio_plugin'] == 'true') {
                 $this->update_plugin($objData->zipball_url);
+            }else{
+                add_action('admin_notices', array($this, 'show_update_notice'));
             }
         }
     }
@@ -80,7 +81,7 @@ class GitHubUpdateChecker {
         foreach ($arrFiles as $strItem) {
             if ($strItem == '.' || $strItem == '..') {continue;} 
             if (is_dir($strTemp_dir . '/' . $strItem)) {
-                rename($strTemp_dir . '/' . $strItem, $strTemp_dir."/{$this->strPlugin_dir_name}");
+                rename($strTemp_dir . '/' . $strItem, $strTemp_dir."/".$this->strPlugin_dir_name);
                 break;
             }
         }
@@ -93,7 +94,7 @@ class GitHubUpdateChecker {
 
         unlink($zip_file);
 
-        echo '<div class="notice notice-success"><p>Plugin updated successfully!</p></div>';
+        echo '<div class="notice notice-success"><p>Plugin '.$this->strPlugin_name.' updated successfully!</p></div>';
     }
 
     private function delete_old_version() {
