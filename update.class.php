@@ -45,7 +45,7 @@ class GitHubUpdateChecker {
     }
 
     public function show_update_notice() {
-        echo '<div class="notice notice-warning"><p>New version of '.$this->strPlugin_name.' is available. <a href="' . admin_url('index.php?update_bvstudio_plugin=true') . '">Update now</a></p></div>';
+        echo '<div class="notice notice-warning"><p>New version of '.$this->strPlugin_name.' is available. <a href="' . admin_url('plugins.php?update_bvstudio_plugin=true') . '">Update now</a></p></div>';
     }
 
     public function update_plugin($url) {
