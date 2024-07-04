@@ -1,13 +1,14 @@
 <?php
 class GitHubUpdateChecker {
-    private $strApi_url = 'https://api.github.com/repos/AndriyBalakalchuk/wp-map-block-view-plugin/releases/latest'; // Заміни 'username/repository' на свій репозиторій
+    private $strApi_url;
     private $strPlugin_file;
     private $strPlugin_dir;
     private $strPlugin_dir_name;
     private $strPlugin_name;
     private $strPlugin_version;
 
-    public function __construct($strPlugin_file) {
+    public function __construct($strPlugin_file,$strApi_url) {
+        $this->strApi_url = $strApi_url;
         $this->strPlugin_file = $strPlugin_file;
         $this->strPlugin_dir = plugin_dir_path($strPlugin_file);
         $this->strPlugin_dir_name = trim(dirname(plugin_basename($strPlugin_file)), '/');
