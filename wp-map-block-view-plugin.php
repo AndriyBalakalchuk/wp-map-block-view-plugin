@@ -2,7 +2,7 @@
 /*
 Plugin Name: GitHub Update Checker
 Description: Simple plugin to check for updates from a public GitHub repository.
-Version: 0.05
+Version: 0.06
 Author: Your Name
 */
 
