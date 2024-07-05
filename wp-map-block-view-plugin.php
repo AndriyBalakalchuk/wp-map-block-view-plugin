@@ -81,6 +81,48 @@ function map_block_view_manufacturers_shortcode() {
     return $strOutput;
 }
 
+// Додаємо REST API маршрут при активації плагіну
+add_action('rest_api_init', function () {
+    register_rest_route(MBV_PLUGIN_NAME.'/v1', '/new-input', array(
+        'methods' => 'GET',
+        'callback' => 'handle_update_table',
+        'permission_callback' => '__return_true'
+    ));
+});
+
+function handle_update_table(WP_REST_Request $request) {
+    // global $wpdb;
+
+    // Отримуємо дані з запиту
+    // $data = $request->get_json_params();
+
+    // Визначаємо таблицю
+    // $table_name = $wpdb->prefix . 'example_table';
+
+    // Очищаємо таблицю
+    // $wpdb->query("TRUNCATE TABLE $table_name");
+
+    // // Перевіряємо чи дані у правильному форматі
+    // if (isset($data['arrCol1']) && isset($data['arrCol2']) && is_array($data['arrCol1']) && is_array($data['arrCol2'])) {
+    //     $arrCol1 = $data['arrCol1'];
+    //     $arrCol2 = $data['arrCol2'];
+
+    //     // Вставляємо нові дані
+    //     for ($i = 0; $i < count($arrCol1); $i++) {
+    //         $wpdb->insert($table_name, array(
+    //             'column1' => $arrCol1[$i],
+    //             'column2' => $arrCol2[$i],
+    //         ));
+    //     }
+
+    //     return new WP_REST_Response('Таблиця успішно оновлена', 200);
+    // } else {
+    //     return new WP_REST_Response('Невірний формат даних', 400);
+    // }
+
+    return new WP_REST_Response('Таблиця успішно оновлена', 200);
+}
+
 function map_block_view_enqueue_shortcode_assets() {
     wp_enqueue_style('map_block_view_styles', MBV_PLUGIN_PUBLIC_URL . '/css/style.css', array(), MBV_VERSION);
     wp_enqueue_script('map_block_view_scripts', MBV_PLUGIN_PUBLIC_URL . '/js/js.js', array(), MBV_VERSION, true);
