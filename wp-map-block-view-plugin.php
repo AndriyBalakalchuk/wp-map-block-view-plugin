@@ -37,6 +37,7 @@ define( 'MBV_PLUGIN_URL', plugin_dir_url(__FILE__));
 define( 'MBV_PLUGIN_PUBLIC_URL', MBV_PLUGIN_URL . 'public' );
 
 // Перевіряємо, чи це сторінка плагінів - Викликаємо клас тільки на сторінці плагінів
+global $pagenow;
 if ($pagenow == 'plugins.php') {
     //запит на підключення класу оновленнь плагіна з GitHub репозиторії за релізом
     require_once('includes/update.class.php');
