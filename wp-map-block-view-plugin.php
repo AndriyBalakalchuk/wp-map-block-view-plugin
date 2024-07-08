@@ -133,13 +133,13 @@ function map_block_view_handle_update_table(WP_REST_Request $request) {
         !is_array($objData["status"]) ||
         !is_array($objData["published"]) ||
         !is_array($objData["area"])) {
-        return new WP_REST_Response(array( 'message' => 'Невірний формат даних' ), 400);
+        return new WP_REST_Response(array('message'=>'Wrong data','code'=>'wrong_data'), 400);
     }
 
     //визначення для якого з блоків прийшли дані
     $strDestination = $objData["destination"][0];
     if($strDestination != "manufacturers" && $strDestination != "projects") {
-        return new WP_REST_Response(array( 'message' => 'Не зареєстрований тип даних' ), 400);
+        return new WP_REST_Response(array('message'=>'Unknown destination','code'=>'unknown_destination'), 400);
     }
 
 
