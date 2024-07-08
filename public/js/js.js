@@ -1,1 +1,1 @@
-console.log("js паше");
+console.log(arrAllMapData);
