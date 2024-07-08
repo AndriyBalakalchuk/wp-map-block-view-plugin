@@ -163,7 +163,7 @@ function map_block_view_handle_update_table(WP_REST_Request $request) {
         ));
     }
 
-    return new WP_REST_Response(array( 'message' => 'Таблиця успішно оновлена' ), 200);
+    return new WP_REST_Response(array( 'message' => 'All data was inserted to your site' ), 200);
 }
 
 function map_block_view_enqueue_shortcode_assets() {
