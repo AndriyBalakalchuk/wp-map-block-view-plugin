@@ -86,7 +86,13 @@ function map_block_view_manufacturers_shortcode() {
     $strOutput = 'Manufacturers block public file not found';
 
     if (file_exists($strManufacturersBlockPath)) {
+        // получить сирий HTML-файл
         $strOutput = file_get_contents($strManufacturersBlockPath);
+        // получить дані з таблиці бази даних
+        $arrMapData = map_block_view_get_filtered_data('destination', 'manufacturers');
+        // echo "<pre>";var_dump($arrMapData);echo "</pre>";exit;
+        // замінити дані в HTML-файлі
+        $strOutput = str_replace('<!--{{data-arrAllMapData}}-->',  "<script>window.arrAllMapData = ".JSON_encode($arrMapData).";</script>", $strOutput);
     }
 
     return $strOutput;
@@ -142,7 +148,6 @@ function map_block_view_handle_update_table(WP_REST_Request $request) {
         return new WP_REST_Response(array('message'=>'Unknown destination','code'=>'unknown_destination'), 400);
     }
 
-
     //видаляємо в таблиці всі стрічки де destination = $strDestination
     $sql = "DELETE FROM $strTableName WHERE destination = '$strDestination'";
     $wpdb->query($sql);
@@ -164,6 +169,21 @@ function map_block_view_handle_update_table(WP_REST_Request $request) {
     }
 
     return new WP_REST_Response(array( 'message' => 'All data was inserted to your site' ), 200);
+}
+
+function map_block_view_get_filtered_data($strFilterColumn, $strFilterValue) {
+    global $wpdb;
+
+    // Захист від SQL ін'єкцій
+    $strTableName = $wpdb->prefix.MBV_DB_NAME;
+    $strFilterColumn = esc_sql($strFilterColumn);
+    $strFilterValue = esc_sql($strFilterValue);
+
+    // Запит до бази даних
+    $objQuery = $wpdb->prepare("SELECT * FROM $strTableName WHERE $strFilterColumn = %s", $strFilterValue);
+    $arrResults = $wpdb->get_results($objQuery, ARRAY_A);
+
+    return $arrResults;
 }
 
 function map_block_view_enqueue_shortcode_assets() {
