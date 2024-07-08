@@ -92,7 +92,7 @@ function map_block_view_manufacturers_shortcode() {
         $arrMapData = map_block_view_get_filtered_data('destination', 'manufacturers');
         // echo "<pre>";var_dump($arrMapData);echo "</pre>";exit;
         // замінити дані в HTML-файлі
-        $strOutput = str_replace('<!--{{data-arrAllMapData}}-->',  "<script>window.arrAllMapData = ".JSON_encode($arrMapData).";</script>", $strOutput);
+        $strOutput = str_replace('<!--{{data-arrManufactMapData}}-->',  "<script>window.arrManufactMapData = ".JSON_encode($arrMapData).";</script>", $strOutput);
     }
 
     return $strOutput;

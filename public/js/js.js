@@ -1,1 +1,1 @@
-console.log(arrAllMapData);
+console.log(arrManufactMapData);
