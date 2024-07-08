@@ -50,10 +50,21 @@ function map_block_view_create_table() {
     global $wpdb;
     $strCharset_collate = $wpdb->get_charset_collate();
 
+//№	Name	Logo Link	Address	Lat/Long	Description EN	Description DE	Act	Publ
+
+
     $sql = "CREATE TABLE IF NOT EXISTS `".($wpdb->prefix.MBV_DB_NAME)."` (
-        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        id int(15) NOT NULL AUTO_INCREMENT,
+        destination text NOT NULL,
         name text NOT NULL,
-        value text NOT NULL,
+        cover_link text NOT NULL,
+        address text NOT NULL,
+        lat_and_long text NOT NULL,
+        description_en text NOT NULL,
+        description_de text NOT NULL,
+        status text NOT NULL,
+        published text NOT NULL,
+        area int(11) NOT NULL,
         PRIMARY KEY (id)
     ) $strCharset_collate;";
 
@@ -84,43 +95,75 @@ function map_block_view_manufacturers_shortcode() {
 // Додаємо REST API маршрут при активації плагіну
 add_action('rest_api_init', function () {
     register_rest_route(MBV_PLUGIN_NAME.'/v1', '/new-input', array(
-        'methods' => 'GET',
-        'callback' => 'handle_update_table',
+        'methods' => 'POST',
+        'callback' => 'map_block_view_handle_update_table',
         'permission_callback' => '__return_true'
     ));
 });
 
-function handle_update_table(WP_REST_Request $request) {
-    // global $wpdb;
+// тест доступ за посиланням localhost:8888/modulmatic-website/wp-json/wp-map-block-view-plugin/v1/new-input
+// тест обʼєкт - {"destination": ["manufacturers"],"name":["Solid Modulbau"],"cover_link":["https://i.ibb.co/Xkm3VTm/Solid-Modulbau-Logo.jpg"],"address":["Produktion & Firmensitz Otto-Hahn-Straße 1-2 48683 Ahaus"],"lat_and_long":["52.08339146970849,7.019180719708498"],"description_en":["Building with Solid.Modulbau is faster, cheaper, and more sustainable! This is our promise to investors and users who are forward-thinking. Otherwise, we will not be able to create the necessary and, above all, affordable living space for our society. We also see our work as a contribution to social peace in Germany and, prospectively, in Europe and the world. At the same time, construction must become climate-neutral, as the construction industry is one of the main contributors to CO2 emissions. If we want to halt climate change, something must be done in our industry – and it must be done today."],"description_de":["Bauen wird mit Solid.Modulbau schneller, günstiger und nachhaltiger! Das ist unser Versprechen an Investoren und Nutzer, die zukunftsorientiert sind. Anders schaffen wir nicht den benötigten und vor allem bezahlbaren Wohnraum für unsere Gesellschaft. Unsere Tätigkeit sehen wir daher auch als Beitrag zum sozialen Frieden in Deutschland und – perspektivisch – in Europa und der Welt. Gleichzeitig muss das Bauen klimaneutral werden, denn die Baubranche ist einer der Hauptverursacher von CO2. Wollen wir den Klimawandel aufhalten, muss sich also vor allem in unserer Branche etwas tun – und zwar heute."],"status":["false"],"published":["true"],"area":[0]}
+function map_block_view_handle_update_table(WP_REST_Request $request) {
+    global $wpdb;
 
     // Отримуємо дані з запиту
-    // $data = $request->get_json_params();
+    $objData = $request->get_json_params();
 
     // Визначаємо таблицю
-    // $table_name = $wpdb->prefix . 'example_table';
+    $strTableName = $wpdb->prefix.MBV_DB_NAME;
 
-    // Очищаємо таблицю
-    // $wpdb->query("TRUNCATE TABLE $table_name");
+    // Перевіряємо чи дані у правильному форматі
+    if( !isset($objData["destination"]) ||
+        !isset($objData["name"]) ||
+        !isset($objData["cover_link"]) ||
+        !isset($objData["address"]) ||
+        !isset($objData["lat_and_long"]) ||
+        !isset($objData["description_en"]) ||
+        !isset($objData["description_de"]) ||
+        !isset($objData["status"]) ||
+        !isset($objData["published"]) ||
+        !isset($objData["area"]) ||
+        !is_array($objData["destination"]) ||
+        !is_array($objData["name"]) ||
+        !is_array($objData["cover_link"]) ||
+        !is_array($objData["address"]) ||
+        !is_array($objData["lat_and_long"]) ||
+        !is_array($objData["description_en"]) ||
+        !is_array($objData["description_de"]) ||
+        !is_array($objData["status"]) ||
+        !is_array($objData["published"]) ||
+        !is_array($objData["area"])) {
+        return new WP_REST_Response(array( 'message' => 'Невірний формат даних' ), 400);
+    }
 
-    // // Перевіряємо чи дані у правильному форматі
-    // if (isset($data['arrCol1']) && isset($data['arrCol2']) && is_array($data['arrCol1']) && is_array($data['arrCol2'])) {
-    //     $arrCol1 = $data['arrCol1'];
-    //     $arrCol2 = $data['arrCol2'];
+    //визначення для якого з блоків прийшли дані
+    $strDestination = $objData["destination"][0];
+    if($strDestination != "manufacturers" && $strDestination != "projects") {
+        return new WP_REST_Response(array( 'message' => 'Не зареєстрований тип даних' ), 400);
+    }
 
-    //     // Вставляємо нові дані
-    //     for ($i = 0; $i < count($arrCol1); $i++) {
-    //         $wpdb->insert($table_name, array(
-    //             'column1' => $arrCol1[$i],
-    //             'column2' => $arrCol2[$i],
-    //         ));
-    //     }
 
-    //     return new WP_REST_Response('Таблиця успішно оновлена', 200);
-    // } else {
-    //     return new WP_REST_Response('Невірний формат даних', 400);
-    // }
+    //видаляємо в таблиці всі стрічки де destination = $strDestination
+    $sql = "DELETE FROM $strTableName WHERE destination = '$strDestination'";
+    $wpdb->query($sql);
 
-    return new WP_REST_Response('Таблиця успішно оновлена', 200);
+    // Вставляємо нові дані
+    for ($i = 0; $i < count($objData["name"]); $i++) {
+        $wpdb->insert($strTableName, array(
+            'destination' => $strDestination,
+            'name' => $objData["name"][$i],
+            'cover_link' => $objData["cover_link"][$i],
+            'address' => $objData["address"][$i],
+            'lat_and_long' => $objData["lat_and_long"][$i],
+            'description_en' => $objData["description_en"][$i],
+            'description_de' => $objData["description_de"][$i],
+            'status' => $objData["status"][$i],
+            'published' => $objData["published"][$i],
+            'area' => $objData["area"][$i],
+        ));
+    }
+
+    return new WP_REST_Response(array( 'message' => 'Таблиця успішно оновлена' ), 200);
 }
 
 function map_block_view_enqueue_shortcode_assets() {
