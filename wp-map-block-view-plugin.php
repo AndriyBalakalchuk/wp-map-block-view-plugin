@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'MBV_DB_NAME', 'map_block_view_db' );
 
-define( 'MBV_VERSION', '0.09' ); //для стилів та скриптів
+define( 'MBV_VERSION', '0.10' ); //для стилів та скриптів
 
 define( 'MBV_PLUGIN', __FILE__ );
 
@@ -49,9 +49,6 @@ if ($pagenow == 'plugins.php') {
 function map_block_view_create_table() {
     global $wpdb;
     $strCharset_collate = $wpdb->get_charset_collate();
-
-//№	Name	Logo Link	Address	Lat/Long	Description EN	Description DE	Act	Publ
-
 
     $sql = "CREATE TABLE IF NOT EXISTS `".($wpdb->prefix.MBV_DB_NAME)."` (
         id int(15) NOT NULL AUTO_INCREMENT,
