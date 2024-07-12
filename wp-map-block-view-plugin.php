@@ -184,8 +184,10 @@ function map_block_view_get_filtered_data($strFilterColumn, $strFilterValue) {
 }
 
 function map_block_view_enqueue_shortcode_assets() {
-    wp_enqueue_style('map_block_view_styles', MBV_PLUGIN_PUBLIC_URL . '/css/style.css', array(), MBV_VERSION);
+    wp_enqueue_style('map_block_view_styles', MBV_PLUGIN_PUBLIC_URL . '/css/style.css', array('map_block_view_swiper_styles'), MBV_VERSION);
     wp_enqueue_script('map_block_view_scripts', MBV_PLUGIN_PUBLIC_URL . '/js/js.js', array(), MBV_VERSION, true);
+	wp_enqueue_style('map_block_view_swiper_styles', MBV_PLUGIN_PUBLIC_URL . '/css/swiper-bundle.min.css', array(), MBV_VERSION);
+    wp_enqueue_script('map_block_view_swiper_scripts', MBV_PLUGIN_PUBLIC_URL . '/js/swiper-bundle.min.js', array(), MBV_VERSION);
 }
 
 // Реєстрація шорткоду
