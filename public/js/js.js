@@ -7,12 +7,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		initialSlide: 4,
 		// количество слайдов за раз
 		slidesPerView: 2,
-		// в зависимости от ширины экрана
+		// в зависимости от ширины экрана 375, 565, 767, 1024
 		breakpoints: {
-			640: {
+			// 375.8: {
+			// 	slidesPerView: 2,
+			// },
+			767.8: {
 				slidesPerView: 3,
 			},
-			1024: {
+			1024.8: {
 				slidesPerView: 5,
 			},
 		},
@@ -98,13 +101,15 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 
 			const item = data[currentIndex];
+			let strLogo = `<div class="slide__logo_image"><img src="${item.cover_link}" alt=""/></div>`;
+			if (!item.cover_link) strLogo = `<div class="slide__logo_watermark"><div>${item.name}</div></div>`;
 			const elementHtml = `
 				<div class="swiper-slide" data-array='${currentIndex}'>
 					<div class="slide">
 						<div class="slide__wrapper">
 							<div class="slide__body">
 								<div class="slide__logo">
-								<div class="slide__logo_image"><img src="https://placehold.co/400x300?text=${currentIndex}" alt=""/></div>
+									${strLogo}
 								</div>
 								<div class="slide__text">
 								<div class="slide__title">${item.name}</div>

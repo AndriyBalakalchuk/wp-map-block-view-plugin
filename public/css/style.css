@@ -39,7 +39,7 @@
 
 .slide {
 	padding: 0 5px;
-	font-size: calc(100% * 0.01px);
+	font-size: 12px;
 }
 
 .slide__wrapper {
@@ -61,6 +61,13 @@
 	height: 100%;
 }
 
+.slide__logo {
+	position: relative;
+	width: 100%;
+	padding-bottom: 75%;
+	background-color: #e5e5e5;
+}
+
 .slide__logo_watermark {
 	width: 100%;
 	height: 100%;
@@ -75,19 +82,14 @@
 .slide__logo_watermark div {
 	font-family: "Montserrat";
 	font-weight: 700;
-	font-size: 22px;
+	font-size: 1.375em;
 	line-height: 1.2;
-	padding: 0 4px;
+	padding: 0 0.25em;
 	color: white;
 	text-align: center;
 }
 
-.slide__logo_image {
-	position: relative;
-	width: 100%;
-	padding-bottom: 75%;
-	background-color: #e5e5e5;
-}
+.slide__logo_image {}
 
 .slide__logo_image img {
 	position: absolute;
@@ -100,16 +102,40 @@
 }
 
 .slide__text {
-	padding: 10px 10px 10px;
+	padding: 0.625em;
 }
 
 .slide__title {
 	font-family: "Montserrat", sans-serif;
 	font-weight: 700;
-	border-left: 4px solid var(--red);
+	border-left: 0.25em solid var(--red);
 	font-size: 1em;
 	line-height: 1.2;
-	padding-left: 8px;
-	max-height: 3.4em;
+	padding-left: 0.5em;
+	max-height: 2.3em;
 	overflow: hidden;
+}
+
+@media screen and (min-width: 375.8px) {
+	.slide {
+		font-size: 13px;
+	}
+}
+
+@media screen and (min-width: 565.8px) {
+	.slide {
+		font-size: 16px;
+	}
+}
+
+@media screen and (min-width: 767.8px) {
+	.slide {
+		font-size: 14px;
+	}
+}
+
+@media screen and (min-width: 1024.8px) {
+	.slide {
+		font-size: 13px;
+	}
 }
