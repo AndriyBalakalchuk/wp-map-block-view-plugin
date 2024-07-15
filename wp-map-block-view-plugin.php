@@ -177,8 +177,13 @@ function map_block_view_get_filtered_data($strFilterColumn, $strFilterValue) {
     $strFilterValue = esc_sql($strFilterValue);
 
     // Запит до бази даних
-    $objQuery = $wpdb->prepare("SELECT * FROM $strTableName WHERE $strFilterColumn = %s", $strFilterValue);
-    $arrResults = $wpdb->get_results($objQuery, ARRAY_A);
+    try{
+        $objQuery = $wpdb->prepare("SELECT * FROM $strTableName WHERE $strFilterColumn = %s", $strFilterValue);
+        $arrResults = $wpdb->get_results($objQuery, ARRAY_A);
+    }catch(Exception $e){
+        error_log($e->getMessage());
+        $arrResults = [];
+    }
 
     return $arrResults;
 }
