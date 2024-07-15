@@ -201,15 +201,23 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Функция для выбора иконки в зависимости от status
 	function getMarkerIcon(status) {
 		const strPath = currentLanguage === 'en' ? '../wp-content/plugins/wp-map-block-view-plugin/public/images/' : './wp-content/plugins/wp-map-block-view-plugin/public/images/';
-		if (status) {
+		if (status === 'Active') {
+			return L.icon({
+				iconUrl: `${strPath}marker-01.svg`,
+				iconSize: [28, 41],
+				iconAnchor: [14, 41],
+				popupAnchor: [1, -34],
+			});
+		} else if (status === 'Negotiations') {
 			return L.icon({
 				iconUrl: `${strPath}marker-02.svg`,
+				iconSize: [28, 41],
 				iconAnchor: [14, 41],
 				popupAnchor: [1, -34],
 			});
 		} else {
 			return L.icon({
-				iconUrl: `${strPath}marker-01.svg`,
+				iconUrl: `${strPath}marker-03.svg`,
 				iconSize: [28, 41],
 				iconAnchor: [14, 41],
 				popupAnchor: [1, -34],
