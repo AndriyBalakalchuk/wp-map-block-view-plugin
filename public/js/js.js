@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			let strLogo = `<div class="slide__logo_image"><img src="${item.cover_link}" alt=""/></div>`;
 			if (!item.cover_link) strLogo = `<div class="slide__logo_watermark"><div>${item.name}</div></div>`;
 			const elementHtml = `
-				<div class="swiper-slide" data-array='${currentIndex}'>
+				<div class="swiper-slide" data-array='${currentIndex}' onclick="openMarkerPopup('${item.id}')">
 					<div class="slide">
 						<div class="slide__wrapper">
 							<div class="slide__body">
@@ -225,12 +225,17 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
+	// Объект для хранения маркеров Leaflet
+	var leafletMarkers = {};
+
 	// Добавление меток на карту с выбором кастомной иконки
 	arrManufactMapData.forEach(function (marker) {
 		const coords = marker.lat_and_long.split(',').map(Number);
 		const popupContent = createPopupContent(marker);
 		const markerIcon = getMarkerIcon(marker.status);
-		L.marker([coords[0], coords[1]], { icon: markerIcon }).bindPopup(popupContent).addTo(map);
+		const leafletMarker = L.marker([coords[0], coords[1]], { icon: markerIcon }).bindPopup(popupContent).addTo(map);
+		console.log(leafletMarker);
+		leafletMarkers[marker.id] = leafletMarker; // Сохранение маркера в объект
 	});
 
 	// Автоматический захват всех маркеров на карте
@@ -266,4 +271,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Убедитесь, что зум изначально отключен
 	map.scrollWheelZoom.disable();
+
+	// Функция для открытия попапа маркера по id
+	window.openMarkerPopup = function (markerId) {
+		const marker = leafletMarkers[markerId];
+		if (marker) {
+			marker.openPopup(); // Открытие попапа соответствующего маркера
+			map.setView(marker.getLatLng(), map.getZoom()); // Центрирование карты на маркер
+		} else {
+			console.log('Marker not found for markerId:', markerId);
+		}
+	};
 });
