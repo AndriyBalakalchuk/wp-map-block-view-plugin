@@ -61,7 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	swiper.on('slideChange', () => {
 		// if the slide is the first
 		if (swiper.isBeginning) {
-			console.log(`First`);
 			setTimeout(() => {
 				// get the element of the first slide
 				const objLastElement = swiper.slides[0];
@@ -77,7 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 		// if the slide is the last
 		if (swiper.isEnd) {
-			console.log(`Last`);
 			setTimeout(() => {
 				// get the element of the last slide
 				const objLastElement = swiper.slides[swiper.slides.length - 1];
@@ -99,17 +97,19 @@ document.addEventListener('DOMContentLoaded', () => {
 	// ascending - sorting direction true - ascending, false - descending
 	// count - number of elements
 	function createElements(data, startIndex, ascending, count) {
+		// delete last element in array
+		let arrData = data.slice(0, data.length - 1);
 		let result = [];
 		let currentIndex = startIndex;
 
 		for (let i = 0; i < count; i++) {
 			if (currentIndex < 0) {
-				currentIndex = data.length - 1;
-			} else if (currentIndex >= data.length) {
+				currentIndex = arrData.length - 1;
+			} else if (currentIndex >= arrData.length) {
 				currentIndex = 0;
 			}
 
-			const item = data[currentIndex];
+			const item = arrData[currentIndex];
 			let strLogo = `<div class="slide__logo_image"><img src="${item.cover_link}" alt=""/></div>`;
 			if (!item.cover_link) strLogo = `<div class="slide__logo_watermark"><div>${item.name}</div></div>`;
 			const elementHtml = `
@@ -180,9 +180,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Функция для создания содержимого popup
 	function createPopupContent(marker) {
-		const description = currentLanguage === 'en' ? marker.description_en : marker.description_de;
+		// определяем язык
+		const strDescription = currentLanguage === 'en' ? marker.description_en : marker.description_de;
+		// создаем логотип
 		let strLogo = `<div class="popup__logo_image"><img src="${marker.cover_link}" alt="${marker.name} logo"></div>`;
+		// если нет логотипа
 		if (!marker.cover_link) strLogo = `<div class="popup__logo_watermark"><div>${marker.name}</div></div>`;
+		// создаем контейнер с информации о размере предприятия m²
+		const strArea = marker.area > 0 ? `<div class="popup__area">${marker.area} m²</div>` : '';
 		return `
 				<div class="popup">
 					<div class="popup__body">
@@ -191,7 +196,8 @@ document.addEventListener('DOMContentLoaded', () => {
 						</div>
 						<div class="popup__text">
 							<div class="popup__title">${marker.name}</div>
-							<div class="popup__description">${description}</div>
+							<div class="popup__description">${strDescription}</div>
+							${strArea}
 						</div>
 					</div>
 				</div>
@@ -199,30 +205,35 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	// Функция для выбора иконки в зависимости от status
-	function getMarkerIcon(status) {
+	function getMarkerIcon(status, area = 0) {
 		const strPath = currentLanguage === 'en' ? '../wp-content/plugins/wp-map-block-view-plugin/public/images/' : './wp-content/plugins/wp-map-block-view-plugin/public/images/';
-		if (status === 'Active') {
-			return L.icon({
-				iconUrl: `${strPath}marker-01.svg`,
-				iconSize: [28, 41],
-				iconAnchor: [14, 41],
-				popupAnchor: [1, -34],
-			});
-		} else if (status === 'Negotiations') {
-			return L.icon({
-				iconUrl: `${strPath}marker-02.svg`,
-				iconSize: [28, 41],
-				iconAnchor: [14, 41],
-				popupAnchor: [1, -34],
-			});
-		} else {
-			return L.icon({
-				iconUrl: `${strPath}marker-03.svg`,
-				iconSize: [28, 41],
-				iconAnchor: [14, 41],
-				popupAnchor: [1, -34],
-			});
+
+		const objMarkerIcon = {
+			iconSize: [30, 30],
+			popupAnchor: [0, -10],
+		};
+
+		// задаем размер иконки в зависимости от значения area (площадь),
+		//	если площадь от 0 до 500 - sm, если от 500 до 1000 - md, если больше 1000 - xl
+		const strIconSize = area < 500 ? 'sm' : area < 1000 ? 'md' : 'xl';
+
+		// выбираем иконку в зависимости от значения status
+		switch (status) {
+			case 'Active':
+				objMarkerIcon.iconUrl = `${strPath}icon-02-${strIconSize}.png`;
+				break;
+			case 'Negotiations':
+				objMarkerIcon.iconUrl = `${strPath}icon-03-${strIconSize}.png`;
+				break;
+			case 'HOME':
+				objMarkerIcon.iconUrl = `${strPath}icon-05-xl.png`;
+				objMarkerIcon.className = `home-marker`;
+				break;
+			default:
+				objMarkerIcon.iconUrl = `${strPath}icon-03-${strIconSize}.png`;
 		}
+		// возвращаем объект с иконкой
+		return L.icon(objMarkerIcon);
 	}
 
 	// Объект для хранения маркеров Leaflet
@@ -232,9 +243,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	arrManufactMapData.forEach(function (marker) {
 		const coords = marker.lat_and_long.split(',').map(Number);
 		const popupContent = createPopupContent(marker);
-		const markerIcon = getMarkerIcon(marker.status);
-		const leafletMarker = L.marker([coords[0], coords[1]], { icon: markerIcon }).bindPopup(popupContent).addTo(map);
-		console.log(leafletMarker);
+		const markerIcon = getMarkerIcon(marker.status, marker.area);
+		const leafletMarker = L.marker([coords[0], coords[1]], { icon: markerIcon }).bindPopup(popupContent, { minWidth: 300 }).addTo(map);
 		leafletMarkers[marker.id] = leafletMarker; // Сохранение маркера в объект
 	});
 
@@ -277,7 +287,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		const marker = leafletMarkers[markerId];
 		if (marker) {
 			marker.openPopup(); // Открытие попапа соответствующего маркера
-			map.setView(marker.getLatLng(), map.getZoom()); // Центрирование карты на маркер
+			// центроровать маркер на карте и сместить на 200 пикселей вверх
+			map.setView([marker.getLatLng().lat + 1.2, marker.getLatLng().lng], 7); // Центрирование карты на маркер
 		} else {
 			console.log('Marker not found for markerId:', markerId);
 		}

@@ -145,9 +145,18 @@
 }
 
 .popup__text {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
+	width: 100%;
+	max-height: 160.78px;
+	overflow: auto;
+}
+
+.popup__description {
+	margin-top: 0.75em;
+}
+
+.popup__area {
+	margin-top: 0.75em;
+	font-weight: bold;
 }
 
 @media screen and (min-width: 375.8px) {
@@ -172,4 +181,8 @@
 	.slide {
 		font-size: 13px;
 	}
+}
+
+.home-marker {
+	z-index: 998 !important;
 }
