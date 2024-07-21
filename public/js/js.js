@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				objMarkerIcon.className = `home-marker`;
 				break;
 			default:
-				objMarkerIcon.iconUrl = `${strPath}icon-03-${strIconSize}.png`;
+				objMarkerIcon.iconUrl = `${strPath}icon-01-${strIconSize}.png`;
 		}
 		// возвращаем объект с иконкой
 		return L.icon(objMarkerIcon);
