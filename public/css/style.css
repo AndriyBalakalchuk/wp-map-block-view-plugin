@@ -2,6 +2,10 @@
 	padding: 10px 0;
 }
 
+.swiper-slide {
+	cursor: pointer;
+}
+
 .swiper-btn-prev,
 .swiper-btn-next {
 	position: absolute;
