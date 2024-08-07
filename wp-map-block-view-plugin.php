@@ -3,7 +3,7 @@
 * Plugin Name:       Map Block View
 * Plugin URI:        https://github.com/AndriyBalakalchuk/wp-map-block-view-plugin/
 * Description:       A plugin for replacing the [map_block_view_manufacturers] shortcode with a block with a production map, which receives data from Google Tables.
-* Version: 0.17
+* Version: 0.18
 * Requires at least: 6.4.5
 * Requires PHP:      7.0
 * Author:            bvstud.io
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'MBV_DB_NAME', 'map_block_view_db' );
 
-define( 'MBV_VERSION', '0.17' ); //для стилів та скриптів
+define( 'MBV_VERSION', '0.18' ); //для стилів та скриптів
 
 define( 'MBV_PLUGIN', __FILE__ );
 
