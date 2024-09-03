@@ -3,7 +3,7 @@
 * Plugin Name:       Map Block View
 * Plugin URI:        https://github.com/AndriyBalakalchuk/wp-map-block-view-plugin/
 * Description:       A plugin for replacing the [map_block_view_manufacturers] shortcode with a block with a production map, which receives data from Google Tables.
-* Version: 0.18
+* Version: 0.19
 * Requires at least: 6.4.5
 * Requires PHP:      7.0
 * Author:            bvstud.io
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'MBV_DB_NAME', 'map_block_view_db' );
 
-define( 'MBV_VERSION', '0.18' ); //для стилів та скриптів
+define( 'MBV_VERSION', '0.19' ); //для стилів та скриптів
 
 define( 'MBV_PLUGIN', __FILE__ );
 
@@ -59,6 +59,7 @@ function map_block_view_create_table() {
         lat_and_long text NOT NULL,
         description_en text NOT NULL,
         description_de text NOT NULL,
+        link_to text NOT NULL,
         status text NOT NULL,
         published text NOT NULL,
         area int(11) NOT NULL,
@@ -105,7 +106,7 @@ add_action('rest_api_init', function () {
 });
 
 // тест доступ за посиланням localhost:8888/modulmatic-website/wp-json/wp-map-block-view-plugin/v1/new-input
-// тест обʼєкт - {"destination": ["manufacturers"],"name":["Solid Modulbau"],"cover_link":["https://i.ibb.co/Xkm3VTm/Solid-Modulbau-Logo.jpg"],"address":["Produktion & Firmensitz Otto-Hahn-Straße 1-2 48683 Ahaus"],"lat_and_long":["52.08339146970849,7.019180719708498"],"description_en":["Building with Solid.Modulbau is faster, cheaper, and more sustainable! This is our promise to investors and users who are forward-thinking. Otherwise, we will not be able to create the necessary and, above all, affordable living space for our society. We also see our work as a contribution to social peace in Germany and, prospectively, in Europe and the world. At the same time, construction must become climate-neutral, as the construction industry is one of the main contributors to CO2 emissions. If we want to halt climate change, something must be done in our industry – and it must be done today."],"description_de":["Bauen wird mit Solid.Modulbau schneller, günstiger und nachhaltiger! Das ist unser Versprechen an Investoren und Nutzer, die zukunftsorientiert sind. Anders schaffen wir nicht den benötigten und vor allem bezahlbaren Wohnraum für unsere Gesellschaft. Unsere Tätigkeit sehen wir daher auch als Beitrag zum sozialen Frieden in Deutschland und – perspektivisch – in Europa und der Welt. Gleichzeitig muss das Bauen klimaneutral werden, denn die Baubranche ist einer der Hauptverursacher von CO2. Wollen wir den Klimawandel aufhalten, muss sich also vor allem in unserer Branche etwas tun – und zwar heute."],"status":["false"],"published":["true"],"area":[0]}
+// тест обʼєкт - {"destination": ["manufacturers"],"name":["Solid Modulbau"],"cover_link":["https://i.ibb.co/Xkm3VTm/Solid-Modulbau-Logo.jpg"],"address":["Produktion & Firmensitz Otto-Hahn-Straße 1-2 48683 Ahaus"],"lat_and_long":["52.08339146970849,7.019180719708498"],"description_en":["Building with Solid.Modulbau is faster, cheaper, and more sustainable! This is our promise to investors and users who are forward-thinking. Otherwise, we will not be able to create the necessary and, above all, affordable living space for our society. We also see our work as a contribution to social peace in Germany and, prospectively, in Europe and the world. At the same time, construction must become climate-neutral, as the construction industry is one of the main contributors to CO2 emissions. If we want to halt climate change, something must be done in our industry – and it must be done today."],"description_de":["Bauen wird mit Solid.Modulbau schneller, günstiger und nachhaltiger! Das ist unser Versprechen an Investoren und Nutzer, die zukunftsorientiert sind. Anders schaffen wir nicht den benötigten und vor allem bezahlbaren Wohnraum für unsere Gesellschaft. Unsere Tätigkeit sehen wir daher auch als Beitrag zum sozialen Frieden in Deutschland und – perspektivisch – in Europa und der Welt. Gleichzeitig muss das Bauen klimaneutral werden, denn die Baubranche ist einer der Hauptverursacher von CO2. Wollen wir den Klimawandel aufhalten, muss sich also vor allem in unserer Branche etwas tun – und zwar heute."],"link_to":[[]],"status":["false"],"published":["true"],"area":[0]}
 function map_block_view_handle_update_table(WP_REST_Request $request) {
     global $wpdb;
 
@@ -123,6 +124,7 @@ function map_block_view_handle_update_table(WP_REST_Request $request) {
         !isset($objData["lat_and_long"]) ||
         !isset($objData["description_en"]) ||
         !isset($objData["description_de"]) ||
+        !isset($objData["link_to"]) ||
         !isset($objData["status"]) ||
         !isset($objData["published"]) ||
         !isset($objData["area"]) ||
@@ -133,6 +135,7 @@ function map_block_view_handle_update_table(WP_REST_Request $request) {
         !is_array($objData["lat_and_long"]) ||
         !is_array($objData["description_en"]) ||
         !is_array($objData["description_de"]) ||
+        !is_array($objData["link_to"]) ||
         !is_array($objData["status"]) ||
         !is_array($objData["published"]) ||
         !is_array($objData["area"])) {
@@ -159,6 +162,7 @@ function map_block_view_handle_update_table(WP_REST_Request $request) {
             'lat_and_long' => $objData["lat_and_long"][$i],
             'description_en' => $objData["description_en"][$i],
             'description_de' => $objData["description_de"][$i],
+            'link_to' => json_encode($objData["link_to"][$i]),
             'status' => $objData["status"][$i],
             'published' => $objData["published"][$i],
             'area' => $objData["area"][$i],
