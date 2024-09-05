@@ -199,6 +199,7 @@ function map_block_view_enqueue_shortcode_assets() {
     wp_enqueue_script('map_block_view_swiper_scripts', MBV_PLUGIN_PUBLIC_URL . '/js/swiper-bundle.min.js', array(), MBV_VERSION);
     wp_enqueue_style('map_block_view_leaflet_styles', MBV_PLUGIN_PUBLIC_URL . '/css/leaflet.css', array(), MBV_VERSION);
     wp_enqueue_script('map_block_view_leaflet_scripts', MBV_PLUGIN_PUBLIC_URL . '/js/leaflet.js', array(), MBV_VERSION);
+    wp_enqueue_script('map_block_view_leaflet-dvf_scripts', MBV_PLUGIN_PUBLIC_URL . '/js/leaflet-dvf.min.js', array('map_block_view_leaflet_scripts'), MBV_VERSION);
 }
 
 // Реєстрація шорткоду

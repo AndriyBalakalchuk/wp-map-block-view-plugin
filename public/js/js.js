@@ -236,8 +236,36 @@ document.addEventListener('DOMContentLoaded', () => {
 		return L.icon(objMarkerIcon);
 	}
 
+	// Добавление дуги на карту между точками
+	arrManufactMapData.forEach(function (marker) {
+		// Получить массив из Json объекта
+		const arrLinkTo = JSON.parse(marker.link_to);
+		// Если массив не пустой
+		if (arrLinkTo.length > 0) {
+			// Перебираем массив
+			arrLinkTo.forEach(function (objLink) {
+				const arrStart = objLink.start.split(',').map(Number);
+				const arrEnd = objLink.end.split(',').map(Number);
+				// Координаты двух точек
+				const latlngs = [
+					[arrStart[1], arrStart[0]],
+					[arrEnd[1], arrEnd[0]],
+				];
+				// Создаем арочную полилинию с настройками
+				const arcedPolyline = new L.ArcedPolyline(latlngs, {
+					distanceToHeight: new L.LinearFunction([0, 0], [1000, 500]), // Настраиваем высоту арки
+					color: '#FF0000', // Цвет линии
+					weight: 2, // Толщина линии
+					opacity: 0.4, // Прозрачность
+				});
+				// Добавляем линию на карту
+				map.addLayer(arcedPolyline);
+			});
+		}
+	});
+
 	// Объект для хранения маркеров Leaflet
-	var leafletMarkers = {};
+	const leafletMarkers = {};
 
 	// Добавление меток на карту с выбором кастомной иконки
 	arrManufactMapData.forEach(function (marker) {
@@ -257,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	map.fitBounds(bounds);
 
 	// Включение зума колесиком при нажатой клавише Ctrl
-	var isCtrlPressed = false;
+	let isCtrlPressed = false;
 
 	window.addEventListener('keydown', function (event) {
 		if (event.key === 'Control') {
