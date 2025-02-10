@@ -175,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Инициализация карты
 	const map = L.map('map');
+	
 
 	// Добавление слоя CartoDB Positron
 	L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
@@ -284,12 +285,14 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	// Автоматический захват всех маркеров на карте
-	const bounds = new L.LatLngBounds();
-	arrManufactMapData.forEach(function (marker) {
-		const coords = marker.lat_and_long.split(',').map(Number);
-		bounds.extend([coords[0], coords[1]]);
-	});
-	map.fitBounds(bounds);
+	// const bounds = new L.LatLngBounds();
+	// arrManufactMapData.forEach(function (marker) {
+	// 	const coords = marker.lat_and_long.split(',').map(Number);
+	// 	bounds.extend([coords[0], coords[1]]);
+	// });
+	// map.fitBounds(bounds);
+	//припудительний зум на модульматике
+	map.setView([48.23181536487591,16.41504362639449], 4);
 
 	// Включение зума колесиком при нажатой клавише Ctrl
 	let isCtrlPressed = false;
