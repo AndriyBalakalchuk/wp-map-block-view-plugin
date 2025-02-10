@@ -3,7 +3,7 @@
 * Plugin Name:       Map Block View
 * Plugin URI:        https://github.com/AndriyBalakalchuk/wp-map-block-view-plugin/
 * Description:       A plugin for replacing the [map_block_view_manufacturers] shortcode with a block with a production map, which receives data from Google Tables.
-* Version: 0.20
+* Version: 0.21
 * Requires at least: 6.4.5
 * Requires PHP:      7.0
 * Author:            bvstud.io
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'MBV_DB_NAME', 'map_block_view_db' );
 
-define( 'MBV_VERSION', '0.20' ); //для стилів та скриптів
+define( 'MBV_VERSION', '0.21' ); //для стилів та скриптів
 
 define( 'MBV_PLUGIN', __FILE__ );
 
@@ -73,24 +73,86 @@ function map_block_view_create_table() {
 // Функція для видалення таблиці при деактивації плагіну
 function map_block_view_delete_table() {
     global $wpdb;
+    delete_option('map_block_view_boolShowLogosSlider');
+    delete_option('map_block_view_boolEnablePopupLogos');
     $sql = "DROP TABLE IF EXISTS ".($wpdb->prefix.MBV_DB_NAME).";";
     $wpdb->query($sql);
+}
+
+// Додаємо сторінку налаштувань у меню
+function map_block_view_add_settings_page() {
+    add_options_page(
+        'Map Block View - Settings', // Назва сторінки
+        'Map Block View', // Назва в меню
+        'manage_options', // Рівень доступу
+        'map_block_view_settings', // Унікальний slug
+        'map_block_view_render_settings_page' // Функція рендеру
+    );
+}
+
+// Відображення сторінки налаштувань
+function map_block_view_render_settings_page() {
+    // Отримуємо поточні значення
+    $boolShowLogosSlider = get_option('map_block_view_boolShowLogosSlider', true);
+    $boolEnablePopupLogos = get_option('map_block_view_boolEnablePopupLogos', true);
+    ?>
+    <div class="wrap">
+        <h1>Map Block View Settings</h1>
+        <form method="post" action="options.php">
+            <?php
+            settings_fields('map_block_view_settings_group'); 
+            do_settings_sections('map_block_view_settings');
+            ?>
+            <table class="form-table">
+                <tr>
+                    <th scope="row">Show logos slider below the map</th>
+                    <td>
+                        <input type="checkbox" name="map_block_view_boolShowLogosSlider" value="1" <?php checked(1, $boolShowLogosSlider); ?> />
+                        <label>Enable / Disable</label>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Enable popup logos</th>
+                    <td>
+                        <input type="checkbox" name="map_block_view_boolEnablePopupLogos" value="1" <?php checked(1, $boolEnablePopupLogos); ?> />
+                        <label>Enable / Disable</label>
+                    </td>
+                </tr>
+            </table>
+            <?php submit_button(); ?>
+        </form>
+    </div>
+    <?php
+}
+
+// Реєстрація налаштувань
+function map_block_view_register_settings() {
+    register_setting('map_block_view_settings_group', 'map_block_view_boolShowLogosSlider');
+    register_setting('map_block_view_settings_group', 'map_block_view_boolEnablePopupLogos');
 }
 
 // Функція для обробки шорткоду
 function map_block_view_manufacturers_shortcode() {
     // HTML код, який замінить шорткод
-    $strManufacturersBlockPath = MBV_PLUGIN_PUBLIC_DIR . '/public.html';
+    $strManufacturersBlockPath = MBV_PLUGIN_PUBLIC_DIR . '/public.php';
     $strOutput = 'Manufacturers block public file not found';
 
     if (file_exists($strManufacturersBlockPath)) {
-        // получить сирий HTML-файл
-        $strOutput = file_get_contents($strManufacturersBlockPath);
         // получить дані з таблиці бази даних
         $arrMapData = map_block_view_get_filtered_data('destination', 'manufacturers');
+        //получить нужен ли слайдер под картой
+        $boolShowLogosSlider = get_option('map_block_view_boolShowLogosSlider', true);
+        //получить нужни ли вспливахи при нажатии на метки
+        $boolEnablePopupLogos = get_option('map_block_view_boolEnablePopupLogos', true);
         // echo "<pre>";var_dump($arrMapData);echo "</pre>";exit;
-        // замінити дані в HTML-файлі
-        $strOutput = str_replace('<!--{{data-arrManufactMapData}}-->',  "<script>window.arrManufactMapData = ".JSON_encode($arrMapData).";</script>", $strOutput);
+        // получить сирий PHP-файл
+        // $strOutput = file_get_contents($strManufacturersBlockPath);
+        // Буферизуємо вивід і підключаємо файл
+        ob_start();
+        include $strManufacturersBlockPath;
+        $strOutput = ob_get_clean();
+        //додаємо массив локацій з бази даних як срипт js змінну в кінець файлу
+        $strOutput .= "<script>window.boolEnablePopupLogos = ".($boolEnablePopupLogos===""?0:$boolEnablePopupLogos).";window.arrManufactMapData = ".JSON_encode($arrMapData).";</script>";
     }
 
     return $strOutput;
@@ -216,6 +278,10 @@ register_deactivation_hook(__FILE__, 'map_block_view_delete_table');
 add_action( 'init', 'map_block_view_register_shortcode' );
 // Додаємо дію для ініціалізації CSS та JavaScript
 add_action('wp_enqueue_scripts', 'map_block_view_enqueue_shortcode_assets');
+// Додаємо сторінку налаштувань
+add_action('admin_menu', 'map_block_view_add_settings_page');
+// Реєстрація налаштувань
+add_action('admin_init', 'map_block_view_register_settings');
 
 /** Always end your PHP files with this closing tag */
 ?>

@@ -7,89 +7,92 @@ document.addEventListener('DOMContentLoaded', () => {
 		return;
 	}
 
-	// creating the slider
-	const swiper = new Swiper('.swiper', {
-		// orientation
-		direction: 'horizontal',
-		// number of the first slide
-		initialSlide: 4,
-		// number of slides at a time
-		slidesPerView: 2,
-		// space between slides
-		spaceBetween: 10,
-		// depending on screen width 375, 565, 767, 1024
-		breakpoints: {
-			// 375.8: {
-			// 	slidesPerView: 2,
-			// },
-			767.8: {
-				slidesPerView: 3,
+	if(document.getElementsByClassName("swiper").length > 0) {
+		// creating the slider
+		const swiper = new Swiper('.swiper', {
+			// orientation
+			direction: 'horizontal',
+			// number of the first slide
+			initialSlide: 4,
+			// number of slides at a time
+			slidesPerView: 2,
+			// space between slides
+			spaceBetween: 10,
+			// depending on screen width 375, 565, 767, 1024
+			breakpoints: {
+				// 375.8: {
+				// 	slidesPerView: 2,
+				// },
+				767.8: {
+					slidesPerView: 3,
+				},
+				1024.8: {
+					slidesPerView: 5,
+				},
 			},
-			1024.8: {
-				slidesPerView: 5,
+			// pagination dots
+			pagination: {
+				el: '.swiper-pagination',
 			},
-		},
-		// pagination dots
-		pagination: {
-			el: '.swiper-pagination',
-		},
-		// navigation arrows
-		navigation: {
-			nextEl: '.swiper-btn-next',
-			prevEl: '.swiper-btn-prev',
-		},
-		on: {
-			// before initializing the slider
-			beforeInit: function () {
-				// get the parent element with slides
-				const nodeParenElement = document.querySelector('.swiper-wrapper');
-				// create an array with the necessary elements, for example, 10 pieces
-				const arrHtml = createElements(arrManufactMapData, 0, true, 20);
-				// if everything is ok, iterate over the array and output it before the carousel initialization
-				if (nodeParenElement && Array.isArray(arrHtml)) {
-					arrHtml.forEach(function (item) {
-						nodeParenElement.insertAdjacentHTML('beforeend', item);
-					});
-				} else {
-					console.log("Div block '.swiper-wrapper' carousel not found, or slide elements could not be generated.");
-				}
+			// navigation arrows
+			navigation: {
+				nextEl: '.swiper-btn-next',
+				prevEl: '.swiper-btn-prev',
 			},
-		},
-	});
+			on: {
+				// before initializing the slider
+				beforeInit: function () {
+					// get the parent element with slides
+					const nodeParenElement = document.querySelector('.swiper-wrapper');
+					// create an array with the necessary elements, for example, 10 pieces
+					const arrHtml = createElements(arrManufactMapData, 0, true, 20);
+					// if everything is ok, iterate over the array and output it before the carousel initialization
+					if (nodeParenElement && Array.isArray(arrHtml)) {
+						arrHtml.forEach(function (item) {
+							nodeParenElement.insertAdjacentHTML('beforeend', item);
+						});
+					} else {
+						console.log("Div block '.swiper-wrapper' carousel not found, or slide elements could not be generated.");
+					}
+				},
+			},
+		});
 
-	// change the active slide
-	swiper.on('slideChange', () => {
-		// if the slide is the first
-		if (swiper.isBeginning) {
-			setTimeout(() => {
-				// get the element of the first slide
-				const objLastElement = swiper.slides[0];
-				// get its number in the array from the data attribute
-				const numInArray = objLastElement.dataset.array;
-				// call the function to create an array with new slides in the desired range
-				const arrNewSliders = createElements(arrManufactMapData, +numInArray - 1, false, swiper.slidesPerViewDynamic());
-				// add new slides to the beginning
-				swiper.prependSlide(arrNewSliders);
-				// remove slides from the end of the carousel
-				swiper.removeSlide(getLastIndexes(swiper.slides.length, swiper.slidesPerViewDynamic()));
-			}, swiper.params.speed);
-		}
-		// if the slide is the last
-		if (swiper.isEnd) {
-			setTimeout(() => {
-				// get the element of the last slide
-				const objLastElement = swiper.slides[swiper.slides.length - 1];
-				// get its number in the array from the data attribute
-				const numInArray = objLastElement.dataset.array;
-				// call the function to create an array with new slides in the desired range
-				const arrNewSliders = createElements(arrManufactMapData, +numInArray + 1, true, swiper.slidesPerViewDynamic());
-				// add new slides to the end
-				swiper.appendSlide(arrNewSliders);
-				// remove slides from the beginning of the carousel
-				swiper.removeSlide([...Array(swiper.slidesPerViewDynamic()).keys()]);
-			}, swiper.params.speed);
-		}
-	});
+
+		// change the active slide
+		swiper.on('slideChange', () => {
+			// if the slide is the first
+			if (swiper.isBeginning) {
+				setTimeout(() => {
+					// get the element of the first slide
+					const objLastElement = swiper.slides[0];
+					// get its number in the array from the data attribute
+					const numInArray = objLastElement.dataset.array;
+					// call the function to create an array with new slides in the desired range
+					const arrNewSliders = createElements(arrManufactMapData, +numInArray - 1, false, swiper.slidesPerViewDynamic());
+					// add new slides to the beginning
+					swiper.prependSlide(arrNewSliders);
+					// remove slides from the end of the carousel
+					swiper.removeSlide(getLastIndexes(swiper.slides.length, swiper.slidesPerViewDynamic()));
+				}, swiper.params.speed);
+			}
+			// if the slide is the last
+			if (swiper.isEnd) {
+				setTimeout(() => {
+					// get the element of the last slide
+					const objLastElement = swiper.slides[swiper.slides.length - 1];
+					// get its number in the array from the data attribute
+					const numInArray = objLastElement.dataset.array;
+					// call the function to create an array with new slides in the desired range
+					const arrNewSliders = createElements(arrManufactMapData, +numInArray + 1, true, swiper.slidesPerViewDynamic());
+					// add new slides to the end
+					swiper.appendSlide(arrNewSliders);
+					// remove slides from the beginning of the carousel
+					swiper.removeSlide([...Array(swiper.slidesPerViewDynamic()).keys()]);
+				}, swiper.params.speed);
+			}
+		});
+	}
 
 	// function to create an HTML string based on a template
 	// data - array with data
@@ -272,7 +275,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		const coords = marker.lat_and_long.split(',').map(Number);
 		const popupContent = createPopupContent(marker);
 		const markerIcon = getMarkerIcon(marker.status, marker.area);
-		const leafletMarker = L.marker([coords[0], coords[1]], { icon: markerIcon }).bindPopup(popupContent, { minWidth: 300 }).addTo(map);
+		const leafletMarker = L.marker([coords[0], coords[1]], { icon: markerIcon });
+		if(boolEnablePopupLogos){
+			leafletMarker.bindPopup(popupContent, { minWidth: 300 });
+		}
+		leafletMarker.addTo(map);
 		leafletMarkers[marker.id] = leafletMarker; // Сохранение маркера в объект
 	});
 

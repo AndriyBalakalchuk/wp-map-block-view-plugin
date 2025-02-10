@@ -5,6 +5,7 @@
 			<div id="map" class="map__body"></div>
 		</divcl>
 		<!-- Головний контейнер зі слайдами -->
+		<?php  if($boolShowLogosSlider){ ?>
 		<div class="swiper">
 			<!-- Обгортка -->
 			<div class="swiper-wrapper">
@@ -16,6 +17,6 @@
 			<div class="swiper-btn-prev"></div>
 			<div class="swiper-btn-next"></div>
 		</div>
+		<?php  } ?>
 	</div>
 </section>
-<!--{{data-arrManufactMapData}}-->
