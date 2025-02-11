@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		return;
 	}
 
-	if(document.getElementsByClassName("swiper").length > 0) {
+	if (document.getElementsByClassName('swiper').length > 0) {
 		// creating the slider
 		const swiper = new Swiper('.swiper', {
 			// orientation
@@ -57,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
 				},
 			},
 		});
-
 
 		// change the active slide
 		swiper.on('slideChange', () => {
@@ -175,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Инициализация карты
 	const map = L.map('map');
-	
 
 	// Добавление слоя CartoDB Positron
 	L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
@@ -210,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Функция для выбора иконки в зависимости от status
 	function getMarkerIcon(status, area = 0) {
-		const strPath = currentLanguage === 'en' ? '../wp-content/plugins/wp-map-block-view-plugin/public/images/' : './wp-content/plugins/wp-map-block-view-plugin/public/images/';
+		const strPath = window.mapUrlOrigin + '/wp-content/plugins/wp-map-block-view-plugin/public/images/';
 
 		const objMarkerIcon = {
 			iconSize: [30, 30],
@@ -277,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const popupContent = createPopupContent(marker);
 		const markerIcon = getMarkerIcon(marker.status, marker.area);
 		const leafletMarker = L.marker([coords[0], coords[1]], { icon: markerIcon });
-		if(boolEnablePopupLogos){
+		if (boolEnablePopupLogos) {
 			leafletMarker.bindPopup(popupContent, { minWidth: 300 });
 		}
 		leafletMarker.addTo(map);
@@ -292,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	// });
 	// map.fitBounds(bounds);
 	//припудительний зум на модульматике
-	map.setView([48.23181536487591,16.41504362639449], 4);
+	map.setView([48.23181536487591, 16.41504362639449], 4);
 
 	// Включение зума колесиком при нажатой клавише Ctrl
 	let isCtrlPressed = false;

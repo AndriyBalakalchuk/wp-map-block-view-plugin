@@ -3,7 +3,7 @@
 * Plugin Name:       Map Block View
 * Plugin URI:        https://github.com/AndriyBalakalchuk/wp-map-block-view-plugin/
 * Description:       A plugin for replacing the [map_block_view_manufacturers] shortcode with a block with a production map, which receives data from Google Tables.
-* Version: 0.22
+* Version: 0.23
 * Requires at least: 6.4.5
 * Requires PHP:      7.0
 * Author:            bvstud.io
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'MBV_DB_NAME', 'map_block_view_db' );
 
-define( 'MBV_VERSION', '0.22' ); //для стилів та скриптів
+define( 'MBV_VERSION', '0.23' ); //для стилів та скриптів
 
 define( 'MBV_PLUGIN', __FILE__ );
 
@@ -152,7 +152,7 @@ function map_block_view_manufacturers_shortcode() {
         include $strManufacturersBlockPath;
         $strOutput = ob_get_clean();
         //додаємо массив локацій з бази даних як срипт js змінну в кінець файлу
-        $strOutput .= "<script>window.boolEnablePopupLogos = ".($boolEnablePopupLogos===""?0:$boolEnablePopupLogos).";window.arrManufactMapData = ".JSON_encode($arrMapData).";</script>";
+        $strOutput .= "<script>window.mapUrlOrigin = '".get_site_url()."';window.boolEnablePopupLogos = ".($boolEnablePopupLogos===""?0:$boolEnablePopupLogos).";window.arrManufactMapData = ".JSON_encode($arrMapData).";</script>";
     }
 
     return $strOutput;
