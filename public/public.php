@@ -1,11 +1,11 @@
-<section class="block2" id="map-block-view">
+<div id="map-block-view">
+	<!-- Map -->
+	<div class="map">
+		<div id="map" class="map__body"></div>
+	</div>
+	<?php  if($boolShowLogosSlider){ ?>
+	<!-- Головний контейнер зі слайдами -->
 	<div class="container">
-		<!-- Map -->
-		<div class="map">
-			<div id="map" class="map__body"></div>
-		</divcl>
-		<!-- Головний контейнер зі слайдами -->
-		<?php  if($boolShowLogosSlider){ ?>
 		<div class="swiper">
 			<!-- Обгортка -->
 			<div class="swiper-wrapper">
@@ -17,6 +17,6 @@
 			<div class="swiper-btn-prev"></div>
 			<div class="swiper-btn-next"></div>
 		</div>
-		<?php  } ?>
 	</div>
-</section>
+	<?php  } ?>
+</div>
