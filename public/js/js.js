@@ -173,7 +173,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	const currentLanguage = getLanguageFromCookie();
 
 	// Инициализация карты
-	const map = L.map('map');
+	const map = L.map('map', {
+		dragging: !L.Browser.mobile, // Отключаем перетаскивание на мобильных устройствах
+	});
 
 	// Добавление слоя CartoDB Positron
 	L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
