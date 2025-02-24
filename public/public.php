@@ -6,7 +6,7 @@
 	<?php  if($boolShowLogosSlider){ ?>
 	<!-- Головний контейнер зі слайдами -->
 	<div class="container">
-		<div class="swiper">
+		<div class="swiper" id="swiper-map">
 			<!-- Обгортка -->
 			<div class="swiper-wrapper">
 				<!-- Слайди -->

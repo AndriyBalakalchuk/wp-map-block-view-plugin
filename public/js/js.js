@@ -7,9 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		return;
 	}
 
-	if (document.getElementsByClassName('swiper').length > 0) {
+	if (document.getElementById('swiper-map')) {
 		// creating the slider
-		const swiper = new Swiper('.swiper', {
+		const swiper = new Swiper('#swiper-map', {
 			// orientation
 			direction: 'horizontal',
 			// number of the first slide
