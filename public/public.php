@@ -1,12 +1,12 @@
 <div id="map-block-view">
 	<!-- Map -->
-	<div class="map">
-		<div id="map" class="map__body"></div>
+	<div class="global-map">
+		<div id="map" class="global-map__body"></div>
 	</div>
 	<?php  if($boolShowLogosSlider){ ?>
 	<!-- Головний контейнер зі слайдами -->
 	<div class="container">
-		<div class="swiper" id="swiper-map">
+		<div class="global-map-swiper swiper" id="swiper-map">
 			<!-- Обгортка -->
 			<div class="swiper-wrapper">
 				<!-- Слайди -->
