@@ -178,9 +178,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	// Добавление слоя CartoDB Positron
-	L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-		attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-	}).addTo(map);
+	L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png?key=cb1_2sfa_1_4ddcf0b652002a7a8e77c0eb', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  }).addTo(map);
 
 	// Функция для создания содержимого popup
 	function createPopupContent(marker) {
